@@ -23,7 +23,7 @@ RecTracker lives in your menu bar and helps you keep track of recorded lectures 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/RecTracker.git
+   git clone https://github.com/fradane/RecTracker.git
    cd RecTracker
    ```
 
