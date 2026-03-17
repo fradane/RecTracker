@@ -1,17 +1,12 @@
-//
-//  RecTrackerApp.swift
-//  RecTracker
-//
-//  Created by Francesco Danese on 09/03/26.
-//
-
 import SwiftUI
 
 @main
 struct RecTrackerApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        Settings {
+            EmptyView()
         }
     }
 }
