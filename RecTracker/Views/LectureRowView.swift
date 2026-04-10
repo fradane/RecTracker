@@ -14,8 +14,6 @@ struct LectureRowView: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text(lecture.courseName)
-                    .fontWeight(.bold)
                 HStack(spacing: 4) {
                     Text(lecture.lectureDate, style: .date)
                         .font(.caption)

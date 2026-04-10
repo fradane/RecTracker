@@ -5,6 +5,8 @@ struct MenuContentView: View {
     @StateObject private var store = LectureStore()
     @State private var showAddSheet = false
     @State private var showCompleted = false
+    @State private var showManageCourses = false
+    @State private var showDeleteCompletedConfirm = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -13,6 +15,13 @@ struct MenuContentView: View {
                 Text("RecTracker")
                     .font(.headline)
                 Spacer()
+                Button {
+                    showManageCourses = true
+                } label: {
+                    Image(systemName: "books.vertical")
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, 6)
                 Button {
                     showAddSheet = true
                 } label: {
@@ -26,8 +35,8 @@ struct MenuContentView: View {
             Divider()
 
             // Lecture list
-            let lectures = showCompleted ? store.completedLectures : store.pendingLectures
-            if lectures.isEmpty {
+            let groups = showCompleted ? store.groupedCompletedLectures : store.groupedPendingLectures
+            if groups.isEmpty {
                 VStack(spacing: 8) {
                     Spacer()
                     Text(showCompleted ? "No completed lectures" : "All caught up, good job!")
@@ -37,8 +46,18 @@ struct MenuContentView: View {
                 }
                 .frame(maxHeight: .infinity)
             } else {
-                List(lectures) { lecture in
-                    LectureRowView(lecture: lecture)
+                List {
+                    ForEach(groups, id: \.0) { courseName, lectures in
+                        Section(header: Text(courseName)
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.primary)
+                        ) {
+                            ForEach(lectures) { lecture in
+                                LectureRowView(lecture: lecture)
+                            }
+                        }
+                    }
                 }
                 .listStyle(.inset)
             }
@@ -56,6 +75,17 @@ struct MenuContentView: View {
                     .toggleStyle(.checkbox)
                     .font(.caption)
                 Spacer()
+                Button {
+                    showDeleteCompletedConfirm = true
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.red)
+                .font(.caption)
+                .opacity(showCompleted && !store.completedLectures.isEmpty ? 1 : 0)
+                .disabled(!(showCompleted && !store.completedLectures.isEmpty))
+                Spacer()
                 Button("Quit") {
                     NSApplication.shared.terminate(nil)
                 }
@@ -67,6 +97,14 @@ struct MenuContentView: View {
         .frame(width: 320, height: 450)
         .sheet(isPresented: $showAddSheet) {
             AddLectureView()
+        }
+        .sheet(isPresented: $showManageCourses) {
+            ManageCoursesView()
+        }
+        .confirmationDialog("Delete all completed recordings?", isPresented: $showDeleteCompletedConfirm, titleVisibility: .visible) {
+            Button("Delete All", role: .destructive) {
+                store.deleteAllCompleted()
+            }
         }
         .environmentObject(store)
     }
